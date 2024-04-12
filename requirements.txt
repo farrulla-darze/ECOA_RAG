@@ -1,0 +1,12 @@
+Flask
+langchain
+langchain-community
+chromadb
+lxml
+wikipedia
+pandas
+python-dotenv
+langchain_openai
+selenium
+unstructured
+langchainhub
