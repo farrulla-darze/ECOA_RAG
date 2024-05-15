@@ -1,12 +1,12 @@
-Flask
 langchain
+langchain_core
 langchain-community
+langchain_openai
 chromadb
-lxml
-wikipedia
 pandas
 python-dotenv
-langchain_openai
 selenium
 unstructured
-langchainhub
+ragas
+termcolor
+langchain-pinecone
