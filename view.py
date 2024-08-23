@@ -1,6 +1,7 @@
 import os
 import streamlit as st
 from streamlit_chat import message
+from database import ask_rag
 
 st.set_page_config(layout="wide")
 st.set_option('deprecation.showPyplotGlobalUse', False)
@@ -9,12 +10,10 @@ st.title("Aplicando IA em Chatbots")
 # WARNING: This will PERMANENTLY delete the entire database
 # if ONLY_NEW_CONTENT:
 # if st.button("Delete database"):
-    
-query_mode = st.checkbox("QUERY MODE", True)
 
 data_source = st.selectbox(
     'Source of data:',
-    ('Movies Database','Simple text', 'URL'))
+    ('Simple text', 'URL'))
 
 def generate_context(prompt, context_data='generated'):
     context = []
@@ -79,7 +78,11 @@ if user_input:
         # cypher = movies_gds_db.construct_cypher(user_input)
         pass
     elif data_source == 'Simple text':
-        pass
+        st.session_state['user_input'].append(user_input)
+        # Ask RAG
+        responses = ask_rag(user_input, debug=True)
+        st.session_state['generated'].append(responses['rag'])
+        # pass
 
     else:
         pass
@@ -96,17 +99,7 @@ with placeholder.container():
 
 
 # Generated Cypher statements
-with another_placeholder.container():
-    if st.session_state['cypher']:
-        st.text_area("Latest generated Cypher statement",
-                     st.session_state['cypher'][-1], height=240)
-
-with third_placeholder.container():
-    if st.session_state['database_results']:
-        # Try to place the graph here
-        try:
-            st.pyplot(nx.draw(st.session_state['graph'][-1][0], with_labels=True, labels=st.session_state['graph'][-1][1]))
-        except:
-            # Error gif
-            st.image("https://cdn.pixabay.com/animation/2023/01/07/11/02/11-02-30-972_512.gif")
-            
+# with another_placeholder.container():
+#     if st.session_state['cypher']:
+#         st.text_area("Latest generated Cypher statement",
+#                      st.session_state['cypher'][-1], height=240)
