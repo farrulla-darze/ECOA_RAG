@@ -75,7 +75,7 @@ if user_input:
         print(responses['rag'])
         st.session_state['generated'].append(responses['llm'])
         st.session_state['rag_generated'].append(responses['rag']['answer'])
-
+        st.session_state['source'] = responses['rag']["context"][0].metadata["source"]
         # pass
 
     else:
@@ -85,8 +85,8 @@ if user_input:
 with placeholder.container():
     if st.session_state['generated']:
         size = len(st.session_state['generated'])
-        # Display only the last three exchanges
-        for i in range(max(size-3, 0), size):
+        # Display only the last two exchanges
+        for i in range(max(size-2, 0), size):
             message(st.session_state['user_input'][i],
                     is_user=True,key=str(i) + '_user')
             message(st.session_state["generated"][i], avatar_style="bottts",key=str(i)+"_generated")
@@ -94,6 +94,6 @@ with placeholder.container():
 
 # Generated Cypher statements
 with another_placeholder.container():
-    if st.session_state['cypher']:
+    if st.session_state['source']:
         st.text_area("Source",
                      st.session_state['source'], height=240)

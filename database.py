@@ -81,12 +81,7 @@ def ask_rag(query, debug=False):
         print(responses)
         return responses
     responses = {"query": query, "llm": llm.invoke(query).content, "rag": rag.invoke(query)}
-    print(responses)
     return responses
-
-print("Asking RAG")
-ask_rag("Quem é o atual presidente da Argentina?")
-
 
 # query = ["Quem é o atual presidente da Argentina?",
 #          "Quem ganhou o Super Bowl 2024?",
