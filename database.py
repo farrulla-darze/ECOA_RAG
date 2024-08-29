@@ -74,14 +74,18 @@ def setup_rag():
 
 def ask_rag(query, debug=False):
     rag = setup_rag()
+    print("key", openai_key)
     llm = ChatOpenAI(model_name="gpt-3.5-turbo", api_key=openai_key)
     if debug:
         responses = {"query": query, "llm": "LLM ANSWER", "rag": "RAG ANSWER"}
         print(responses)
         return responses
-    responses = {"query": query, "llm": llm.invoke(query), "rag": rag.invoke(query)}
+    responses = {"query": query, "llm": llm.invoke(query).content, "rag": rag.invoke(query)}
     print(responses)
     return responses
+
+print("Asking RAG")
+ask_rag("Quem é o atual presidente da Argentina?")
 
 
 # query = ["Quem é o atual presidente da Argentina?",

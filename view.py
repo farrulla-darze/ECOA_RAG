@@ -36,21 +36,20 @@ def generate_context(prompt, context_data='generated'):
 if 'generated' not in st.session_state:
     st.session_state['generated'] = []
 # Neo4j database results
+if 'rag_generated' not in st.session_state:
+    st.session_state['rag_generated'] = []
+
+if "source" not in st.session_state:
+    st.session_state["source"] = None
+
 if 'database_results' not in st.session_state:
     st.session_state['database_results'] = []
 # User input
 if 'user_input' not in st.session_state:
     st.session_state['user_input'] = []
-# Generated Cypher statements
-if 'cypher' not in st.session_state:
-    st.session_state['cypher'] = []
-# Graph    
-if 'graph' not in st.session_state:
-    st.session_state['graph'] = []
 
 def get_text():
-    input_text = st.text_input(
-        "Ask away", "", key="input")
+    input_text = st.text_input("Ask away", "", key="input")
     return input_text
 
 
@@ -67,21 +66,16 @@ user_input = get_text()
 
 if user_input:
     if data_source == 'Movies Database':
-        # webpage = st.toggle("Load url", False)
-        # Hardcoded UserID
-        USER_ID = "Tomaz"
-
-        # On the first execution, we have to create a user node in the database.
-        # movies_gds_db.query_database("""MERGE (u:User {id: $userId})""", {'userId': USER_ID})
-
-        # cypher = generate_cypher(generate_context(user_input, 'database_results'))
-        # cypher = movies_gds_db.construct_cypher(user_input)
         pass
     elif data_source == 'Simple text':
         st.session_state['user_input'].append(user_input)
         # Ask RAG
-        responses = ask_rag(user_input, debug=True)
-        st.session_state['generated'].append(responses['rag'])
+        responses = ask_rag(user_input)
+
+        print(responses['rag'])
+        st.session_state['generated'].append(responses['llm'])
+        st.session_state['rag_generated'].append(responses['rag']['answer'])
+
         # pass
 
     else:
@@ -94,12 +88,12 @@ with placeholder.container():
         # Display only the last three exchanges
         for i in range(max(size-3, 0), size):
             message(st.session_state['user_input'][i],
-                    is_user=True, key=str(i) + '_user')
-            message(st.session_state["generated"][i], key=str(i))
-
+                    is_user=True,key=str(i) + '_user')
+            message(st.session_state["generated"][i], avatar_style="bottts",key=str(i)+"_generated")
+            message(st.session_state["rag_generated"][i], avatar_style="bottts-neutral",key=str(i)+"_rag")
 
 # Generated Cypher statements
-# with another_placeholder.container():
-#     if st.session_state['cypher']:
-#         st.text_area("Latest generated Cypher statement",
-#                      st.session_state['cypher'][-1], height=240)
+with another_placeholder.container():
+    if st.session_state['cypher']:
+        st.text_area("Source",
+                     st.session_state['source'], height=240)
