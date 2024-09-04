@@ -1,0 +1,1 @@
+from view.chat_view import ChatView
