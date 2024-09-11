@@ -32,26 +32,10 @@ class Database(ABC):
     def GetInstance():
         pass
 
-    @property
-    @abstractmethod
-    def vectorstore(self):
-        pass
-
     @abstractmethod
     def _setup_rag(self):
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def ask_rag(self, query, debug=False):
-        pass
-
-    @abstractmethod
-    def query():
         raise NotImplementedError
-    
-    @staticmethod
-    def GetInstance():
-        if Database._instance is not None:
-            return Database()
-        return Database._instance
-

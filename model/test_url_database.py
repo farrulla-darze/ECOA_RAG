@@ -13,7 +13,7 @@ class TestWebDatabase(unittest.TestCase):
         mock_exists.return_value = True
 
         # Initialize WebDatabase
-        db = WebDatabase()
+        db = WebDatabase.GetInstance(load=False, database=mock_chroma)
 
         # Check if Chroma was initialized with the correct parameters
         mock_chroma.assert_called_once_with(
@@ -29,6 +29,17 @@ class TestWebDatabase(unittest.TestCase):
         # Mock os.path.exists to return False
         mock_exists.return_value = False
 
+        # Mock urls:
+        mock_urls = ["https://pt.wikipedia.org/wiki/Javier_Milei",
+            "https://www.cbsnews.com/news/super-bowl-winners-list-history/",
+        #     "https://ge.globo.com/futebol/times/corinthians/noticia/2024/02/16/corinthians-anuncia-a-contratacao-do-lateral-direito-matheuzinho.ghtml",
+        #     "https://ge.globo.com/futebol/times/botafogo/noticia/2024/02/16/luiz-henrique-do-botafogo-tem-lesao-na-panturrilha.ghtml",
+        #     "https://ge.globo.com/futebol/times/fluminense/noticia/2024/02/16/escalacao-do-fluminense-diniz-escala-reservas-contra-madureira-mas-tera-john-kennedy-e-douglas-costa.ghtml",
+        # "https://www.lemonde.fr/football/article/2024/02/25/ligue-1-le-psg-arrache-le-nul-de-justesse-contre-rennes-monaco-remonte-sur-le-podium_6218528_1616938.html",
+        # "https://ge.globo.com/futebol/futebol-internacional/futebol-frances/copa-da-franca/noticia/2024/02/27/perri-e-heroi-nos-penaltis-e-lyon-avanca-de-fase-na-copa-da-franca.ghtml",
+        "https://ge.globo.com/tenis/noticia/2024/02/27/joao-fonseca-sofre-com-condicoes-ruins-da-quadra-no-atp-santiago-e-e-eliminado.ghtml",   
+        ]
+
         # Mock SeleniumURLLoader to return documents
         mock_loader_instance = mock_loader.return_value
         mock_loader_instance.load.return_value = [MagicMock()]
@@ -38,10 +49,10 @@ class TestWebDatabase(unittest.TestCase):
         mock_text_splitter_instance.split_documents.return_value = [MagicMock()]
 
         # Initialize WebDatabase
-        db = WebDatabase.GetInstance()
+        db = WebDatabase.GetInstance(load=False, urls=mock_urls)
 
         # Check if SeleniumURLLoader was called with the correct URLs
-        mock_loader.assert_called_once_with(urls=db.mock_urls)
+        mock_loader.assert_called_once_with(urls=mock_urls)
         mock_loader_instance.load.assert_called_once()
 
         # Check if RecursiveCharacterTextSplitter was called with the correct parameters
