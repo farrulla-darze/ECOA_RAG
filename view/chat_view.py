@@ -95,6 +95,7 @@ class ChatView():
                 size = len(st.session_state['generated'])
                 # Display only the last two exchanges
                 for i in range(max(size-2, 0), size):
+                    print(str(i),"User input: ", st.session_state['user_input'][i])
                     message(st.session_state['user_input'][i],
                             is_user=True,key=str(i) + '_user')
                     message(st.session_state["generated"][i], avatar_style="bottts",key=str(i)+"_generated")
