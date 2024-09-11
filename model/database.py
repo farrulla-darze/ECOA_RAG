@@ -50,8 +50,9 @@ class Database():
 
     
     def setup_rag(self):
-        vectorstore = self.create_db()
-        retriever = vectorstore.as_retriever()
+        # vectorstore = self.create_db()
+
+        retriever = self.vectorstore.as_retriever()
         prompt = hub.pull("rlm/rag-prompt")
         llm = ChatOpenAI(model_name="gpt-3.5-turbo", api_key=openai_key)
 

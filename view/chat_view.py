@@ -23,11 +23,8 @@ def _get_text():
     input_text = st.text_input("Ask away", "", key="input")
     return input_text
 
-if 'user_input' not in st.session_state:
-    st.session_state['user_input'] = []
-    st.session_state['generated'] = []
-    st.session_state['rag_generated'] = []
-    st.session_state['source'] = None
+# if 'user_input' not in st.session_state:
+
 
 class ChatView():
 
@@ -47,6 +44,11 @@ class ChatView():
         
         self.user_input = st.text_input("Type your message here:", "")
 
+        st.session_state['user_input'] = []
+        st.session_state['generated'] = []
+        st.session_state['rag_generated'] = []
+        st.session_state['source'] = None
+
     def _generate_context(self, prompt, context_data='generated'):
         context = []
         # If any history exists
@@ -65,10 +67,10 @@ class ChatView():
         context.append({'role': 'user', 'content': str(prompt)})
         return context
 
-    def _get_text():
-        pass
+    def get_text(self):
+        return self.user_input
 
-    def display(self):
+    def display(self, responses=None):
         if self.user_input:
             if self.data_source == 'Movies Database':
                 pass
@@ -76,12 +78,12 @@ class ChatView():
                 st.session_state['user_input'].append(self.user_input)
                 # Ask RAG
                 # responses = ask_rag(self.user_input)
-                responses = {"query": self.user_input, "llm": "LLM ANSWER", "rag": {"question":self.user_input,"answer":"RAG ANSWER","context":[{"metadata":{"source":"Simple text"}}]}}
+                # responses = {"query": self.user_input, "llm": "LLM ANSWER", "rag": {"question":self.user_input,"answer":"RAG ANSWER","context":[{"metadata":{"source":"Simple text"}}]}}
 
                 # print(responses['rag'])
                 st.session_state['generated'].append(responses['llm'])
                 st.session_state['rag_generated'].append(responses['rag']['answer'])
-                st.session_state['source'] = responses['rag']["context"][0]["metadata"]["source"]
+                st.session_state['source'] = responses['rag']["context"][0].metadata["source"]
                 # pass
 
             else:
@@ -104,7 +106,7 @@ class ChatView():
                 st.text_area("Source",
                             st.session_state['source'], height=240)
 
-if __name__ == "__main__":
-    view = ChatView()
-    view.display()
-    # setup_view()
+# if __name__ == "__main__":
+#     view = ChatView()
+#     view.display()
+#     # setup_view()

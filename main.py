@@ -1,14 +1,14 @@
-# from model import Database
+from model import Database
 from view import *
-# from controller import Controller
+from controller import ChatController
 
 
 if __name__ == "__main__":
     # Initialize MVC components
-    # model = Model()
+    model = Database()
     view = ChatView()
-    # controller = Controller(model, view)
+    controller = ChatController(model, view)
 
     # Run the chat interface
-    # controller.run()
-    view.display()
+    controller.run()
+    # view.display()
