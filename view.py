@@ -70,7 +70,7 @@ if user_input:
     elif data_source == 'Simple text':
         st.session_state['user_input'].append(user_input)
         # Ask RAG
-        responses = ask_rag(user_input)
+        responses = ask_rag(user_input, source="pdf")
 
         print(responses['rag'])
         st.session_state['generated'].append(responses['llm'])
