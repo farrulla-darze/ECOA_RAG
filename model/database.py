@@ -27,10 +27,20 @@ openai_key = os.getenv("OPENAI_API_KEY")
 
 class Database(ABC):
 
+    @property
+    def vectorstore(self):
+        return self.vectorstore
+    
+    @property
+    def _instance(self):
+        return None
+
     @staticmethod
-    @abstractmethod
     def GetInstance():
-        pass
+        if Database._instance is None:
+            print("Creating new instance")
+            Database._instance = Database()
+        return Database._instance
 
     @abstractmethod
     def _setup_rag(self):

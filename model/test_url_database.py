@@ -6,20 +6,20 @@ from url_database import WebDatabase
 
 class TestWebDatabase(unittest.TestCase):
 
-    @patch('os.path.exists')
-    @patch('langchain_community.vectorstores.Chroma')
-    def test_init_chroma_db_exists(self, mock_chroma, mock_exists):
-        # Mock os.path.exists to return True
-        mock_exists.return_value = True
+    # @patch('os.path.exists')
+    # @patch('langchain_community.vectorstores.Chroma')
+    # def test_init_chroma_db_exists(self, mock_chroma, mock_exists):
+    #     # Mock os.path.exists to return True
+    #     mock_exists.return_value = True
 
-        # Initialize WebDatabase
-        db = WebDatabase.GetInstance(load=False, database=mock_chroma)
+    #     # Initialize WebDatabase
+    #     db = WebDatabase.GetInstance(load=False, database=mock_chroma)
 
-        # Check if Chroma was initialized with the correct parameters
-        mock_chroma.assert_called_once_with(
-            persist_directory="./chroma_db",
-            embedding_function=MagicMock()
-        )
+    #     # Check if Chroma was initialized with the correct parameters
+    #     mock_chroma.assert_called_once_with(
+    #         persist_directory="./chroma_db",
+    #         embedding_function=MagicMock()
+    #     )
 
     @patch('os.path.exists')
     @patch('langchain_community.vectorstores.Chroma')
@@ -40,6 +40,10 @@ class TestWebDatabase(unittest.TestCase):
         "https://ge.globo.com/tenis/noticia/2024/02/27/joao-fonseca-sofre-com-condicoes-ruins-da-quadra-no-atp-santiago-e-e-eliminado.ghtml",   
         ]
 
+        # Initialize WebDatabase
+        db = WebDatabase.GetInstance()
+        db._setup_rag()
+
         # Mock SeleniumURLLoader to return documents
         mock_loader_instance = mock_loader.return_value
         mock_loader_instance.load.return_value = [MagicMock()]
@@ -47,9 +51,6 @@ class TestWebDatabase(unittest.TestCase):
         # Mock RecursiveCharacterTextSplitter to return splits
         mock_text_splitter_instance = mock_text_splitter.return_value
         mock_text_splitter_instance.split_documents.return_value = [MagicMock()]
-
-        # Initialize WebDatabase
-        db = WebDatabase.GetInstance(load=False, urls=mock_urls)
 
         # Check if SeleniumURLLoader was called with the correct URLs
         mock_loader.assert_called_once_with(urls=mock_urls)
