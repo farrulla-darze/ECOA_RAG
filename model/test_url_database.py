@@ -2,7 +2,12 @@
 
 import unittest
 from unittest.mock import patch, MagicMock
+from langchain_community.vectorstores import Chroma
+from langchain_community.document_loaders import SeleniumURLLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
 from url_database import WebDatabase
+
 
 class TestWebDatabase(unittest.TestCase):
 
@@ -41,9 +46,8 @@ class TestWebDatabase(unittest.TestCase):
         ]
 
         # Initialize WebDatabase
-        db = WebDatabase.GetInstance()
-        db._setup_rag()
-
+        db = WebDatabase(load=False, urls=mock_urls, text_splitter=mock_text_splitter, loader=mock_loader)
+        db.ask_rag("What is the capital of Brazil?")
         # Mock SeleniumURLLoader to return documents
         mock_loader_instance = mock_loader.return_value
         mock_loader_instance.load.return_value = [MagicMock()]

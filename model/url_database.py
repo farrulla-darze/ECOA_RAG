@@ -15,26 +15,13 @@ load_dotenv()
 
 openai_key = os.getenv("OPENAI_API_KEY")
 
-mock_urls = ["https://pt.wikipedia.org/wiki/Javier_Milei",
-        "https://www.cbsnews.com/news/super-bowl-winners-list-history/",
-    #    "https://ge.globo.com/futebol/times/corinthians/noticia/2024/02/16/corinthians-anuncia-a-contratacao-do-lateral-direito-matheuzinho.ghtml",
-    #     "ht tps://ge.globo.com/futebol/times/botafogo/noticia/2024/02/16/luiz-henrique-do-botafogo-tem-lesao-na-panturrilha.ghtml",
-    #     "https://ge.globo.com/futebol/times/fluminense/noticia/2024/02/16/escalacao-do-fluminense-diniz-escala-reservas-contra-madureira-mas-tera-john-kennedy-e-douglas-costa.ghtml",
-    # "https://www.lemonde.fr/football/article/2024/02/25/ligue-1-le-psg-arrache-le-nul-de-justesse-contre-rennes-monaco-remonte-sur-le-podium_6218528_1616938.html",
-    # "https://ge.globo.com/futebol/futebol-internacional/futebol-frances/copa-da-franca/noticia/2024/02/27/perri-e-heroi-nos-penaltis-e-lyon-avanca-de-fase-na-copa-da-franca.ghtml",
-    "https://ge.globo.com/tenis/noticia/2024/02/27/joao-fonseca-sofre-com-condicoes-ruins-da-quadra-no-atp-santiago-e-e-eliminado.ghtml",   
-]
-
 class WebDatabase(Database):
+  
+    def format_docs(self, docs: List[Document]):
+        return "\n\n".join(doc.page_content for doc in docs)
+    
 
-    _instance = None
-
-    @property
-    def vectorstore(self) -> Chroma:
-        return self.vectorstore
-
-    def __init__(self, load=True, urls=mock_urls) -> None:
-        super().__init__()
+    def _initialize(self, load, urls, text_splitter=None, loader=None):
         if os.path.exists("./chroma_db") and load:
         
             self.vectorstore = Chroma(
@@ -42,20 +29,16 @@ class WebDatabase(Database):
                 embedding_function=OpenAIEmbeddings()
             )
         else:
-            loader = SeleniumURLLoader(urls=urls)
+            if loader is None:
+                loader = SeleniumURLLoader(urls=urls)
             docs = loader.load()
 
-            print("Loaded documents")
+            if text_splitter is None:
+                text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
 
-            text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
             splits = text_splitter.split_documents(docs)
 
-            print("Splitted documents")
-
             self.vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings(), persist_directory="./chroma_db")
- 
-    def format_docs(self, docs: List[Document]):
-        return "\n\n".join(doc.page_content for doc in docs)
     
     def _setup_rag(self):
         # super()
@@ -86,4 +69,3 @@ class WebDatabase(Database):
             return responses
         responses = {"query": query, "llm": llm.invoke(query).content, "rag": rag.invoke(query)}
         return responses
-
