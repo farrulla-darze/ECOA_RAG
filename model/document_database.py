@@ -9,7 +9,7 @@ from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 import os
-from database import Database
+from model.database import Database
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -21,7 +21,7 @@ class DocumentDatabase(Database):
         return "\n\n".join(doc.page_content for doc in docs)
     
 
-    def _initialize(self, load, file_path="data/pdfs", text_splitter=None, loader=None):
+    def _initialize(self, load=True, file_path="data/pdfs", text_splitter=None, loader=None):
         if os.path.exists("./chroma_db") and load:
         
             self.vectorstore = Chroma(
@@ -29,6 +29,8 @@ class DocumentDatabase(Database):
                 embedding_function=OpenAIEmbeddings()
             )
         else:
+
+            print("Loading documents from PDFs")
             documents_paths = []
             splits = []
             
@@ -39,19 +41,22 @@ class DocumentDatabase(Database):
                         file_path = os.path.join(root, file)
                         documents_paths.append(file_path)
 
+            print(f"Found {len(documents_paths)} PDFs")
+            i = 0
             for document_path in documents_paths:
+                print(f"Processing document {i+1}/{len(documents_paths)}")
                 loader = PDFPlumberLoader(file_path=document_path)
                 docs = loader.load()
 
                 if text_splitter is None:
                     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
 
-                splits.append(text_splitter.split_documents(docs))
+                splits.extend(text_splitter.split_documents(docs))
 
+                i += 1
             self.vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings(), persist_directory="./chroma_db")            
     
     def _setup_rag(self):
-        # super()
         retriever = self.vectorstore.as_retriever()
         prompt = hub.pull("rlm/rag-prompt")
         llm = ChatOpenAI(model_name="gpt-3.5-turbo", api_key=openai_key)
@@ -71,11 +76,9 @@ class DocumentDatabase(Database):
 
     def ask_rag(self, query,debug=False):
         rag = self._setup_rag()
-        print("key", openai_key)
         llm = ChatOpenAI(model_name="gpt-3.5-turbo", api_key=openai_key)
         if debug:
             responses = {"query": query, "llm": "LLM ANSWER", "rag": "RAG ANSWER"}
-            print(responses)
             return responses
         responses = {"query": query, "llm": llm.invoke(query).content, "rag": rag.invoke(query)}
         return responses

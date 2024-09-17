@@ -41,6 +41,8 @@ class ChatView():
             self.third_placeholder = st.empty()
         with col1:
             self.placeholder = st.empty()
+
+        self.key:int=0
         
         self.user_input = st.text_input("Type your message here:", "")
 
@@ -97,15 +99,18 @@ class ChatView():
                 for i in range(max(size-2, 0), size):
                     print(str(i),"User input: ", st.session_state['user_input'][i])
                     message(st.session_state['user_input'][i],
-                            is_user=True,key=str(i) + '_user')
-                    message(st.session_state["generated"][i], avatar_style="bottts",key=str(i)+"_generated")
-                    message(st.session_state["rag_generated"][i], avatar_style="bottts-neutral",key=str(i)+"_rag")
+                            is_user=True,key=str(self.key) + '_user')
+                    message(st.session_state["generated"][i], avatar_style="bottts",key=str(self.key)+"_generated")
+                    message(st.session_state["rag_generated"][i], avatar_style="bottts-neutral",key=str(self.key)+"_rag")
+                
+                    self.key+=1
 
         # Generated Cypher statements
         with self.another_placeholder.container():
             if st.session_state['source']:
                 st.text_area("Source",
-                            st.session_state['source'], height=240)
+                            st.session_state['source'],key=self.key, height=240)
+                
 
 # if __name__ == "__main__":
 #     view = ChatView()

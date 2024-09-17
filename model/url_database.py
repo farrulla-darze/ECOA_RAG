@@ -9,7 +9,7 @@ from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 import os
-from database import Database
+from model.database import Database
 from dotenv import load_dotenv
 load_dotenv()
 
