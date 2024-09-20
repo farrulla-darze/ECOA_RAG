@@ -9,7 +9,7 @@ from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 import os
-from database import Database
+from model.database import Database
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -74,7 +74,7 @@ class DocumentDatabase(Database):
 
         return rag_chain_with_source
 
-    def ask_rag(self, query,debug=False, *args):
+    def ask_rag(self, query,debug=False, *args) -> dict:
         rag_chain = self._setup_rag()
         llm = ChatOpenAI(model_name="gpt-3.5-turbo", api_key=openai_key)
         if debug:

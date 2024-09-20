@@ -29,10 +29,10 @@ def _get_text():
 class ChatView():
 
     def __init__(self):
-        st.title("Simple Chat Interface")
-        self.data_source = st.selectbox(
-        'Source of data:',
-        ('Simple text', 'URL'))
+        st.title("Compliance Assistant")
+        self.values = st.slider("Buscar em quantos documentos", 1, 10)
+        self.retriever_k = 1
+
 
         col1, col2 = st.columns([2, 1])
 
@@ -70,27 +70,20 @@ class ChatView():
         return context
 
     def get_text(self):
+        self.retriever_k = self.values
         return self.user_input
 
     def display(self, responses=None):
-        if self.user_input:
-            if self.data_source == 'Movies Database':
-                pass
-            elif self.data_source == 'Simple text':
-                st.session_state['user_input'].append(self.user_input)
-                # Ask RAG
-                # responses = ask_rag(self.user_input)
-                # responses = {"query": self.user_input, "llm": "LLM ANSWER", "rag": {"question":self.user_input,"answer":"RAG ANSWER","context":[{"metadata":{"source":"Simple text"}}]}}
+        if self.user_input:        
+            st.session_state['user_input'].append(self.user_input)
+            st.session_state['generated'].append(responses['llm'])
+            st.session_state['rag_generated'].append(responses['rag']['answer'])
+            sources = ""
+            for i in range(len(responses['rag']['context'])):
+                print("Context: ",responses['rag']['context'][i].metadata["source"])
+                sources+=responses['rag']['context'][i].metadata["source"]+"\n"
+            st.session_state['source'] = sources
 
-                # print(responses['rag'])
-                st.session_state['generated'].append(responses['llm'])
-                st.session_state['rag_generated'].append(responses['rag']['answer'])
-                st.session_state['source'] = responses['rag']["context"][0].metadata["source"]
-                # pass
-
-            else:
-                pass
-            
         # Message placeholder
         with self.placeholder.container():
             if st.session_state['generated']:

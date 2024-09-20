@@ -8,14 +8,13 @@ class ChatController:
 
     def run(self):
         print("Running chat controller")
+        last_input = None
         while True:
             user_input = self.view.get_text()
-            if user_input:
+            if user_input != last_input:
                 # self.db.add_user_input(user_input)
                 responses = self.db.ask_rag(user_input)
-                print("\n\n\n")
-                print(responses['rag']["context"][0].metadata["source"])
-                
+                last_input = user_input
                 self.view.display(responses=responses)
             else:
                 break
