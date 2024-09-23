@@ -42,5 +42,5 @@ class Database(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def ask_rag(self, query, debug=False) -> dict:
+    def ask_rag(self, query, *args) -> dict:
         raise NotImplementedError

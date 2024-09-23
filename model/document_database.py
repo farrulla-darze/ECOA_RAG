@@ -74,11 +74,17 @@ class DocumentDatabase(Database):
 
         return rag_chain_with_source
 
-    def ask_rag(self, query,debug=False, *args) -> dict:
+    def ask_rag(self, query, debug=False, *args) -> dict:
+        print("args = ",args)
+        # kwargs = len(args) > 0
+        chain_params = {}
+        if len(args) > 0:
+            chain_params = args[0]
         rag_chain = self._setup_rag()
         llm = ChatOpenAI(model_name="gpt-3.5-turbo", api_key=openai_key)
         if debug:
-            responses = {"query": query, "llm": "LLM ANSWER", "rag": "RAG ANSWER"}
+            fake_docs = [Document(page_content="CONTEXT", metadata={"source":"SOURCE"+str(i)}) for i in range(1, chain_params["retriever_k"]+1)]
+            responses = {"query": query, "llm": "LLM ANSWER", "rag": {"answer":"RAG ANSWER", "context": fake_docs}} 
             return responses
         responses = {"query": query, "llm": llm.invoke(query).content, "rag": rag_chain.invoke(query)}
         return responses
