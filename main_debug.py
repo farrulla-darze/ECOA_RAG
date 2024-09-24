@@ -9,7 +9,7 @@ if __name__ == "__main__":
     model = DocumentDatabase()
     # view = ChatView()
     web_view = ChatURLView()
-    controller = ChatController(model, view)
+    controller = ChatController(model, web_view)
 
     # Run the chat interface
     controller.run(debug=True)
