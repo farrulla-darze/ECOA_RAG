@@ -1,8 +1,8 @@
 from model.database import Database
-from view import ChatView
+from view import *
 
 class ChatController:
-    def __init__(self, db: Database, view: ChatView):
+    def __init__(self, db: Database, view: View):
         self.db = db
         self.view = view
 

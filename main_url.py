@@ -1,16 +1,15 @@
 # from model import Database
-from model import WebDatabase, DocumentDatabase
+from model import WebDatabase
 from view import *
 from controller import ChatController
 
 
 if __name__ == "__main__":
     # Initialize MVC components
-    model = DocumentDatabase()
-    # view = ChatView()
-    web_view = ChatURLView()
+    model = WebDatabase()
+    view = ChatURLView()
     controller = ChatController(model, view)
 
     # Run the chat interface
-    controller.run(debug=True)
+    controller.run()
     # view.display()

@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+from view.view import View
 from streamlit_chat import message
 # from model.database import ask_rag
 
@@ -26,7 +27,7 @@ def _get_text():
 # if 'user_input' not in st.session_state:
 
 
-class ChatView():
+class ChatURLView(View):
 
     def __init__(self):
         st.title("Compliance Assistant")
