@@ -31,10 +31,13 @@ class WebDatabase(Database):
         else:
             if loader is None:
                 loader = SeleniumURLLoader(urls=urls)
+
+            self.loader = loader
             docs = loader.load()
 
             if text_splitter is None:
                 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+            self.text_splitter = text_splitter
 
             splits = text_splitter.split_documents(docs)
 
@@ -58,6 +61,10 @@ class WebDatabase(Database):
         ).assign(answer=rag_chain_from_docs)
 
         return rag_chain_with_source
+
+    def add_url(self, url):
+        docs = self.loader
+        self.vectorstore.add_url(url)
 
     def ask_rag(self, query,debug=False):
         rag = self._setup_rag()
