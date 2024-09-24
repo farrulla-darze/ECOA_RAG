@@ -57,7 +57,11 @@ class DocumentDatabase(Database):
             self.vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings(), persist_directory="./chroma_db")            
     
     def _setup_rag(self, *args, **kwargs):
-        retriever = self.vectorstore.as_retriever()
+        if len(args) > 0:
+            chain_params = args[0]
+        retriever = self.vectorstore.as_retriever(
+            search_kwargs={"k": chain_params["retriever_k"]}
+        )
         prompt = hub.pull("rlm/rag-prompt")
         llm = ChatOpenAI(model_name="gpt-3.5-turbo", api_key=openai_key)
 
@@ -78,13 +82,18 @@ class DocumentDatabase(Database):
         print("args = ",args)
         # kwargs = len(args) > 0
         chain_params = {}
+        output_format = "string"
         if len(args) > 0:
             chain_params = args[0]
-        rag_chain = self._setup_rag()
+            if len(args) > 1:
+                output_format = args[1]
+        rag_chain = self._setup_rag(chain_params)
         llm = ChatOpenAI(model_name="gpt-3.5-turbo", api_key=openai_key)
         if debug:
             fake_docs = [Document(page_content="CONTEXT", metadata={"source":"SOURCE"+str(i)}) for i in range(1, chain_params["retriever_k"]+1)]
             responses = {"query": query, "llm": "LLM ANSWER", "rag": {"answer":"RAG ANSWER", "context": fake_docs}} 
             return responses
         responses = {"query": query, "llm": llm.invoke(query).content, "rag": rag_chain.invoke(query)}
+        # if output_format == "stream":
+        #     responses. = responses["rag"]["answer"].content
         return responses

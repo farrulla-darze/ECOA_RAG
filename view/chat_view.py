@@ -36,18 +36,23 @@ class ChatView():
 
         col1, col2 = st.columns([2, 1])
 
+        self.key:int=0
+
         with col2:
             self.another_placeholder = st.empty()
             self.third_placeholder = st.empty()
         with col1:
-            self.placeholder = st.empty()
+            self.human_message = st.chat_message("user")
+            self.llm_message = st.chat_message("gpt" )
+            self.rag_message = st.chat_message("rag" )
 
-        self.key:int=0
         
         self.user_input = st.text_input("Type your message here:", "")
 
         st.session_state['user_input'] = []
+        st.session_state['generated_stream'] = None
         st.session_state['generated'] = []
+        st.session_state['rag_stream'] = None
         st.session_state['rag_generated'] = []
         st.session_state['source'] = None
 
@@ -83,26 +88,47 @@ class ChatView():
                 print("Context: ",responses['rag']['context'][i].metadata["source"])
                 sources+=responses['rag']['context'][i].metadata["source"]+"\n"
             st.session_state['source'] = sources
+            if "llm_stream" in responses:
+                st.session_state['generated_stream'] = responses['llm_stream']
+            if "rag_stream" in responses:
+                st.session_state['rag_stream'] = responses['rag_stream']
 
-        # Message placeholder
-        with self.placeholder.container():
-            if st.session_state['generated']:
-                size = len(st.session_state['generated'])
-                # Display only the last two exchanges
-                for i in range(max(size-2, 0), size):
-                    print(str(i),"User input: ", st.session_state['user_input'][i])
-                    message(st.session_state['user_input'][i],
-                            is_user=True,key=str(self.key) + '_user')
-                    message(st.session_state["generated"][i], avatar_style="bottts",key=str(self.key)+"_generated")
-                    message(st.session_state["rag_generated"][i], avatar_style="bottts-neutral",key=str(self.key)+"_rag")
+        # # Message placeholder
+        # with self.placeholder.container():
+        #     if st.session_state['generated']:
                 
-                    self.key+=1
+        #         size = len(st.session_state['generated'])
+        #         # Display only the last two exchanges
+        #         for i in range(max(size-2, 0), size):
+        #             print(str(i),"User input: ", st.session_state['user_input'][i])
+        #             message(st.session_state['user_input'][i],
+        #                     is_user=True,key=str(self.key) + '_user')
+        #             message(st.session_state["generated"][i], avatar_style="bottts",key=str(self.key)+"_generated")
+        #             message(st.session_state["rag_generated"][i], avatar_style="bottts-neutral",key=str(self.key)+"_rag")
+                
+        with self.human_message.container():
+            if st.session_state['user_input']:
+                self.human_message.text(st.session_state['user_input'][-1])
+        
+        with self.llm_message.container():
+            if st.session_state['generated_stream']:
+                st.write_stream(st.session_state['llm_stream'])
+            elif st.session_state['generated']:
+                self.llm_message.text(st.session_state['generated'][-1])
+            
+        with self.rag_message.container():
+            if st.session_state['rag_stream']:
+                st.write_stream(st.session_state['rag_stream'])
+            elif st.session_state['rag_generated']:
+                self.rag_message.text(st.session_state['rag_generated'][-1])
 
         # Generated Cypher statements
         with self.another_placeholder.container():
             if st.session_state['source']:
                 st.text_area("Source",
                             st.session_state['source'],key=self.key, height=240)
+        
+        self.key += 1
                 
 
 # if __name__ == "__main__":
