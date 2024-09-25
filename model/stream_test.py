@@ -96,13 +96,18 @@ class DocumentDatabase(Database):
             responses = {"query": query, "llm": "LLM ANSWER", "rag": {"answer":"RAG ANSWER", "context": fake_docs}} 
             return responses
         if output_format == "stream":
-            responses = {"query": query, "llm_stream": llm.stream(query), "rag_stream": rag_chain.stream(query)}
+            #FIX: scheck how stream rag chain
+            responses = {"query": query, "llm_stream": llm.stream(query), "rag_stream": rag_chain.invoke(query)}
         else:
             responses = {"query": query, "llm": llm.invoke(query).content, "rag": rag_chain.invoke(query)}
         return responses
 
 db = DocumentDatabase()
-res = db.ask_rag("What is the capital of France?", chain_params={"retriever_k": 1}, output_format="stream")
+res = db.ask_rag("how should suspicious betting be reported?", chain_params={"retriever_k": 1}, output_format="stream")
 
-for chunk in res["rag_stream"]:
-    print(chunk.content, end="|", flush=True)
+
+
+for chunk in res:
+    if "answer" in chunk:
+        print(chunk)
+    # print(chunk.content, end="|", flush=True)

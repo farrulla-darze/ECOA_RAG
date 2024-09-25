@@ -94,7 +94,8 @@ class DocumentDatabase(Database):
             responses = {"query": query, "llm": "LLM ANSWER", "rag": {"answer":"RAG ANSWER", "context": fake_docs}} 
             return responses
         if output_format == "stream":
-            responses = {"query": query, "llm_stream": llm.stream(query).content, "rag_stream": rag_chain.stream(query)}
+            responses = {"query": query, "llm_stream": llm.stream(query), "rag_stream": rag_chain.stream(query)}
         else:
             responses = {"query": query, "llm": llm.invoke(query).content, "rag": rag_chain.invoke(query)}
         return responses
+

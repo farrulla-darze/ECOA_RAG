@@ -15,7 +15,8 @@ class ChatController:
             if user_input != last_input:
                 # self.db.add_user_input(user_input)
                 query_par = {"retriever_k": retriever_k}
-                responses = self.db.ask_rag(user_input, debug, query_par)
+                output_format = "stream"
+                responses = self.db.ask_rag(user_input, debug, query_par, output_format)
                 last_input = user_input
                 self.view.display(responses=responses)
             else:

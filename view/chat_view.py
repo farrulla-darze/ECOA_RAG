@@ -79,20 +79,27 @@ class ChatView(View):
         self.retriever_k = self.values
         return self.user_input
 
-    def display(self, responses=None):
-        if self.user_input:        
+    def display(self, responses:dict=None):
+        if self.user_input:
+            print(responses.get)        
             st.session_state['user_input'].append(self.user_input)
-            st.session_state['generated'].append(responses['llm'])
-            st.session_state['rag_generated'].append(responses['rag']['answer'])
-            sources = ""
-            for i in range(len(responses['rag']['context'])):
-                print("Context: ",responses['rag']['context'][i].metadata["source"])
-                sources+=responses['rag']['context'][i].metadata["source"]+"\n"
-            st.session_state['source'] = sources
+            if 'llm' in responses:
+                st.session_state['generated'].append(responses['llm'])
+            if 'rag' in responses:
+                st.session_state['rag_generated'].append(responses['rag']['answer'])
+                sources = []
+                for i in range(len(responses['rag']['context'])):
+                    print("Context: ",responses['rag']['context'][i].metadata["source"])
+                    sources.append(responses['rag']['context'][i].metadata["source"])
+                st.session_state['source'] = sources
             if "llm_stream" in responses:
                 st.session_state['generated_stream'] = responses['llm_stream']
             if "rag_stream" in responses:
                 st.session_state['rag_stream'] = responses['rag_stream']
+                for i in range(len(responses['rag_stream']['context'])):
+                    print("Context: ",responses['rag_stream']['context'][i].metadata["source"])
+                    sources.append(responses['rag_stream']['context'][i].metadata["source"])
+                st.session_state['source'] = sources
 
                         
         with self.human_message.container():
@@ -102,7 +109,7 @@ class ChatView(View):
         with self.llm_message.container():
             if st.session_state['generated_stream']:
                 print("LLM Stream: ",st.session_state['generated_stream'])
-                st.write_stream(st.session_state['llm_stream'])
+                st.write_stream(st.session_state['generated_stream'])
             elif st.session_state['generated']:
                 self.llm_message.markdown(st.session_state['generated'][-1])
             
@@ -110,14 +117,20 @@ class ChatView(View):
             if st.session_state['rag_stream']:
                 print("RAG Stream: ",st.session_state['rag_stream'])
                 st.write_stream(st.session_state['rag_stream'])
+                # for chunk in st.session_state['rag_stream']:
+                #     if "answer" in chunk:
+                #         self.rag_message.markdown(chunk["answer"])
             elif st.session_state['rag_generated']:
                 self.rag_message.markdown(st.session_state['rag_generated'][-1])
 
         # Generated Cypher statements
         with self.another_placeholder.container():
             if st.session_state['source']:
-                st.text_area("Source",
-                            st.session_state['source'],key=self.key, height=240)
+                for i in range(len(st.session_state['source'])):
+                    st.write(st.session_state['source'][i])
+                    st.divider()
+                # st.text_area("Source",
+                #             st.session_state['source'],key=self.key, height=240)
         
         self.key += 1
                 
