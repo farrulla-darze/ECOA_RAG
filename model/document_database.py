@@ -93,7 +93,8 @@ class DocumentDatabase(Database):
             fake_docs = [Document(page_content="CONTEXT", metadata={"source":"SOURCE"+str(i)}) for i in range(1, chain_params["retriever_k"]+1)]
             responses = {"query": query, "llm": "LLM ANSWER", "rag": {"answer":"RAG ANSWER", "context": fake_docs}} 
             return responses
-        responses = {"query": query, "llm": llm.invoke(query).content, "rag": rag_chain.invoke(query)}
-        # if output_format == "stream":
-        #     responses. = responses["rag"]["answer"].content
+        if output_format == "stream":
+            responses = {"query": query, "llm_stream": llm.stream(query).content, "rag_stream": rag_chain.stream(query)}
+        else:
+            responses = {"query": query, "llm": llm.invoke(query).content, "rag": rag_chain.invoke(query)}
         return responses
