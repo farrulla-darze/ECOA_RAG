@@ -55,7 +55,7 @@ class ChatView(View):
         st.session_state['generated'] = []
         st.session_state['rag_stream'] = None
         st.session_state['rag_generated'] = []
-        st.session_state['source'] = None
+        st.session_state['sources'] = None
 
     def _generate_context(self, prompt, context_data='generated'):
         context = []
@@ -91,15 +91,12 @@ class ChatView(View):
                 for i in range(len(responses['rag']['context'])):
                     print("Context: ",responses['rag']['context'][i].metadata["source"])
                     sources.append(responses['rag']['context'][i].metadata["source"])
-                st.session_state['source'] = sources
+                st.session_state['sources'] = sources
             if "llm_stream" in responses:
                 st.session_state['generated_stream'] = responses['llm_stream']
             if "rag_stream" in responses:
                 st.session_state['rag_stream'] = responses['rag_stream']
-                for i in range(len(responses['rag_stream']['context'])):
-                    print("Context: ",responses['rag_stream']['context'][i].metadata["source"])
-                    sources.append(responses['rag_stream']['context'][i].metadata["source"])
-                st.session_state['source'] = sources
+                st.session_state['sources'] = responses['sources']
 
                         
         with self.human_message.container():
@@ -125,9 +122,9 @@ class ChatView(View):
 
         # Generated Cypher statements
         with self.another_placeholder.container():
-            if st.session_state['source']:
-                for i in range(len(st.session_state['source'])):
-                    st.write(st.session_state['source'][i])
+            if st.session_state['sources']:
+                for i in range(len(st.session_state['sources'])):
+                    st.write(st.session_state['sources'][i])
                     st.divider()
                 # st.text_area("Source",
                 #             st.session_state['source'],key=self.key, height=240)

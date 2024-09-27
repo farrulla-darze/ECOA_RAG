@@ -94,7 +94,18 @@ class DocumentDatabase(Database):
             responses = {"query": query, "llm": "LLM ANSWER", "rag": {"answer":"RAG ANSWER", "context": fake_docs}} 
             return responses
         if output_format == "stream":
-            responses = {"query": query, "llm_stream": llm.stream(query), "rag_stream": rag_chain.stream(query)}
+            # Get sources
+            # print(rag_chain.invoke(query))
+            # sources = rag_chain.invoke(query).metadata["source"]
+            sources = []
+            context = rag_chain.invoke(query)["context"]
+            answer_chain = rag_chain.pick("answer")
+            for i in range(len(context)):
+                print("Context: ",context[i].metadata)
+                sources.append(context[i].metadata["source"])
+                if "page" in context[i].metadata:
+                    sources[i] += "\n\n Pagina " + str(context[i].metadata["page"])
+            responses = {"query": query, "llm_stream": llm.stream(query), "rag_stream": answer_chain.stream(query), "sources": sources}
         else:
             responses = {"query": query, "llm": llm.invoke(query).content, "rag": rag_chain.invoke(query)}
         return responses
