@@ -31,7 +31,15 @@ class ChatView(View):
 
     def __init__(self):
         st.title("Compliance Assistant")
-        self.values = st.slider("Buscar em quantos documentos", 1, 10)
+        
+        search_params = st.expander("Search Parameters", expanded=True)
+
+        with search_params:
+            k_filter, docs_filters = st.columns([2, 1])
+            with k_filter:
+                self.values = st.slider("Buscar em quantos documentos", 1, 10)
+            with docs_filters:
+                self.filter = st.multiselect("Filtrar por", ["Regulamentação", "Contratos", "Políticas", "Outros"], default=["Regulamentação", "Contratos", "Políticas", "Outros"])
         self.retriever_k = 1
 
 
@@ -40,7 +48,7 @@ class ChatView(View):
         self.key:int=0
 
         with col2:
-            self.another_placeholder = st.empty()
+            self.sources_tab = st.empty()
             self.third_placeholder = st.empty()
         with col1:
             self.human_message = st.chat_message("user")
@@ -121,7 +129,7 @@ class ChatView(View):
                 self.rag_message.markdown(st.session_state['rag_generated'][-1])
 
         # Generated Cypher statements
-        with self.another_placeholder.container():
+        with self.sources_tab.container():
             if st.session_state['sources']:
                 for i in range(len(st.session_state['sources'])):
                     st.write(st.session_state['sources'][i])

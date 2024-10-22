@@ -1,8 +1,10 @@
 from typing import List
 from langchain import hub
+# import promptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PDFPlumberLoader
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
@@ -35,7 +37,7 @@ class DocumentDatabase(Database):
             splits = []
             
             # load all pdfs in the directory and subdirectories
-            for root, dirs, files in os.walk(file_path):
+            for root, dirnames, files in os.walk(file_path):
                 for file in files:
                     if file.endswith(".pdf"):
                         file_path = os.path.join(root, file)
@@ -47,6 +49,7 @@ class DocumentDatabase(Database):
                 print(f"Processing document {i+1}/{len(documents_paths)}")
                 loader = PDFPlumberLoader(file_path=document_path)
                 docs = loader.load()
+                docs.extend
 
                 if text_splitter is None:
                     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
@@ -59,15 +62,24 @@ class DocumentDatabase(Database):
     def _setup_rag(self, *args, **kwargs):
         if len(args) > 0:
             chain_params = args[0]
+        # if "filter_dict" in kwargs:
+        print(kwargs)
         retriever = self.vectorstore.as_retriever(
             search_kwargs={"k": chain_params["retriever_k"]}
         )
-        prompt = hub.pull("rlm/rag-prompt")
-        llm = ChatOpenAI(model_name="gpt-3.5-turbo", api_key=openai_key)
+        template = PromptTemplate.from_template('''
+            You are a compliance expert in the sports betting bussiness giving legal advice to a client.
+            The client asks you the following question: "{question}"
+            You have to provide an answer based on the following documents:{context}
+            Be concise and clear in your answer.
+        ''')
+        # prompt = hub.pull("rlm/rag-prompt")
+        
+        llm = ChatOpenAI(model_name="gpt-4o-mini", api_key=openai_key)
 
         rag_chain_from_docs = ( RunnablePassthrough.assign(
             context=(lambda x: self.format_docs(x["context"])))
-            | prompt
+            | template
             | llm
             | StrOutputParser()
         )
@@ -78,7 +90,7 @@ class DocumentDatabase(Database):
 
         return rag_chain_with_source
 
-    def ask_rag(self, query, debug=False, *args) -> dict:
+    def ask_rag(self, query, debug=False, *args, **kwargs) -> dict:
         print("args = ",args)
         # kwargs = len(args) > 0
         chain_params = {}
@@ -87,8 +99,11 @@ class DocumentDatabase(Database):
             chain_params = args[0]
             if len(args) > 1:
                 output_format = args[1]
-        rag_chain = self._setup_rag(chain_params)
-        llm = ChatOpenAI(model_name="gpt-3.5-turbo", api_key=openai_key)
+        filter_dict = {}
+        if "filter_dict" in kwargs:
+            filter_dict = kwargs["filter_dict"]
+        rag_chain = self._setup_rag(chain_params, filter_dict=filter_dict)
+        llm = ChatOpenAI(model_name="gpt-4o-mini", api_key=openai_key)
         if debug:
             fake_docs = [Document(page_content="CONTEXT", metadata={"source":"SOURCE"+str(i)}) for i in range(1, chain_params["retriever_k"]+1)]
             responses = {"query": query, "llm": "LLM ANSWER", "rag": {"answer":"RAG ANSWER", "context": fake_docs}} 
