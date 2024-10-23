@@ -18,24 +18,30 @@ load_dotenv()
 openai_key = os.getenv("OPENAI_API_KEY")
 
 class DocumentDatabase(Database):
+
+    paths = []
   
     def format_docs(self, docs: List[Document]):
         return "\n\n".join(doc.page_content for doc in docs)
     
 
-    def _initialize(self, load=True, file_path="data/pdfs", text_splitter=None, loader=None):
+    def _initialize(self, load=True, file_path="data/", text_splitter=None, loader=None):
         if os.path.exists("./chroma_db") and load:
         
             self.vectorstore = Chroma(
                 persist_directory="./chroma_db",
                 embedding_function=OpenAIEmbeddings()
             )
+
         else:
 
             print("Loading documents from PDFs")
             documents_paths = []
             splits = []
             
+            # get subdirectories names
+            subjects = [f.path for f in os.scandir(file_path) if f.is_dir()]
+
             # load all pdfs in the directory and subdirectories
             for root, dirnames, files in os.walk(file_path):
                 for file in files:
@@ -49,7 +55,14 @@ class DocumentDatabase(Database):
                 print(f"Processing document {i+1}/{len(documents_paths)}")
                 loader = PDFPlumberLoader(file_path=document_path)
                 docs = loader.load()
-                docs.extend
+                for doc in docs:
+                    for subject in subjects:
+                        if subject in document_path:
+                            doc.metadata['subject'] = subject
+                    # doc.metadata['subject'] = document_path
+                
+                # {"source": document_path}
+
 
                 if text_splitter is None:
                     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
@@ -57,6 +70,7 @@ class DocumentDatabase(Database):
                 splits.extend(text_splitter.split_documents(docs))
 
                 i += 1
+            print("Finished loading documents")
             self.vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings(), persist_directory="./chroma_db")            
     
     def _setup_rag(self, *args, **kwargs):
