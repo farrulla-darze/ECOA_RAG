@@ -116,6 +116,7 @@ class DocumentDatabase(Database):
         filter_dict = {}
         if "filter_dict" in kwargs:
             filter_dict = kwargs["filter_dict"]
+        print("Filter dict: ", filter_dict)
         rag_chain = self._setup_rag(chain_params, filter_dict=filter_dict)
         llm = ChatOpenAI(model_name="gpt-4o-mini", api_key=openai_key)
         if debug:

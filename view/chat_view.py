@@ -32,14 +32,16 @@ class ChatView(View):
     def __init__(self):
         st.title("Compliance Assistant")
         
-        search_params = st.expander("Search Parameters", expanded=True)
+        search_params = st.expander("Search Parameters", expanded=False)
 
         with search_params:
             k_filter, docs_filters = st.columns([2, 1])
             with k_filter:
                 self.values = st.slider("Buscar em quantos documentos", 1, 10)
             with docs_filters:
-                self.filter = st.multiselect("Filtrar por", ["Regulamentação", "Contratos", "Políticas", "Outros"], default=["Regulamentação", "Contratos", "Políticas", "Outros"])
+                # TODO: Change hardcode strings to dynamic values
+                topics = ["AML FT", "Lei de Defesa do Consumidor", "Procedimento Adminsitrativo e Contraordenações", "Regulação de Jogos","Regulação de Pagamentos"]
+                self.search_filter = st.multiselect("Filtrar por", topics, default=topics)
         self.retriever_k = 1
 
 
@@ -52,8 +54,8 @@ class ChatView(View):
             self.third_placeholder = st.empty()
         with col1:
             self.human_message = st.chat_message("user")
-            self.llm_message = st.chat_message("gpt" )
-            self.rag_message = st.chat_message("rag" )
+            self.llm_message = st.chat_message("gpt")
+            self.rag_message = st.chat_message("rag")
 
         
         self.user_input = st.text_input("Type your message here:", "")
@@ -86,6 +88,9 @@ class ChatView(View):
     def get_text(self):
         self.retriever_k = self.values
         return self.user_input
+    
+    def get_search_filters(self):
+        return self.search_filter
 
     def display(self, responses:dict=None):
         if self.user_input:
