@@ -24,6 +24,17 @@ def _get_text():
     input_text = st.text_input("Ask away", "", key="input")
     return input_text
 
+def format_function(text):
+    "Wrap text in newline if it's to big"
+    new_text = ""
+    line = ""
+    for word in text.split():
+        line += word + " "
+        new_text += word + " "
+        if len(line) > 10:
+            new_text += "\n"
+            line = ""
+    return new_text
 # if 'user_input' not in st.session_state:
 
 
@@ -35,13 +46,14 @@ class ChatView(View):
         search_params = st.expander("Search Parameters", expanded=False)
 
         with search_params:
-            k_filter, docs_filters = st.columns([2, 1])
+            k_filter, docs_filters = st.columns([1, 1])
             with k_filter:
                 self.values = st.slider("Buscar em quantos documentos", 1, 10)
             with docs_filters:
                 # TODO: Change hardcode strings to dynamic values
                 topics = ["AML FT", "Lei de Defesa do Consumidor", "Procedimento Adminsitrativo e Contraordenações", "Regulação de Jogos","Regulação de Pagamentos"]
-                self.search_filter = st.multiselect("Filtrar por", topics, default=topics)
+                self.search_filter = st.multiselect("Filtrar por", topics, default=topics, format_func=format_function)
+                # self
         self.retriever_k = 1
 
 
@@ -93,8 +105,10 @@ class ChatView(View):
         return self.search_filter
 
     def display(self, responses:dict=None):
+        print("Called display")
         if self.user_input:
-            print(responses.get)        
+            print("User input: ",self.user_input)
+            print(responses)        
             st.session_state['user_input'].append(self.user_input)
             if 'llm' in responses:
                 st.session_state['generated'].append(responses['llm'])

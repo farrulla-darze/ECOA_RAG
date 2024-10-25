@@ -20,7 +20,8 @@ openai_key = os.getenv("OPENAI_API_KEY")
 class DocumentDatabase(Database):
 
     paths = []
-  
+    base_path = "data/SRIJ Regulação e Normas/"
+
     def format_docs(self, docs: List[Document]):
         return "\n\n".join(doc.page_content for doc in docs)
     
@@ -76,11 +77,21 @@ class DocumentDatabase(Database):
     def _setup_rag(self, *args, **kwargs):
         if len(args) > 0:
             chain_params = args[0]
-        # if "filter_dict" in kwargs:
-        print(kwargs)
-        retriever = self.vectorstore.as_retriever(
-            search_kwargs={"k": chain_params["retriever_k"]}
-        )
+        if "filter_dict" in kwargs.keys():
+            filter_dict = kwargs["filter_dict"]
+            for i in range(len(filter_dict["filters"])):
+                full_filter = self.base_path + filter_dict["filters"][i]
+                filter_dict["filters"][i] = full_filter
+            retriever = self.vectorstore.as_retriever(
+                search_kwargs={
+                    "k": chain_params["retriever_k"],
+                    "filter": {"subject": {"$in":filter_dict["filters"]}},
+                }
+            )
+        else:
+            retriever = self.vectorstore.as_retriever(
+                search_kwargs={"k": chain_params["retriever_k"]}
+            )
         template = PromptTemplate.from_template('''
             You are a compliance expert in the sports betting bussiness giving legal advice to a client.
             The client asks you the following question: "{question}"
@@ -116,8 +127,10 @@ class DocumentDatabase(Database):
         filter_dict = {}
         if "filter_dict" in kwargs:
             filter_dict = kwargs["filter_dict"]
-        print("Filter dict: ", filter_dict)
-        rag_chain = self._setup_rag(chain_params, filter_dict=filter_dict)
+            print("Filter dict: ", filter_dict)
+            rag_chain = self._setup_rag(chain_params, filter_dict=filter_dict)
+        else:
+            rag_chain = self._setup_rag(chain_params)
         llm = ChatOpenAI(model_name="gpt-4o-mini", api_key=openai_key)
         if debug:
             fake_docs = [Document(page_content="CONTEXT", metadata={"source":"SOURCE"+str(i)}) for i in range(1, chain_params["retriever_k"]+1)]
