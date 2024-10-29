@@ -105,10 +105,7 @@ class ChatView(View):
         return self.search_filter
 
     def display(self, responses:dict=None):
-        print("Called display")
         if self.user_input:
-            print("User input: ",self.user_input)
-            print(responses)        
             st.session_state['user_input'].append(self.user_input)
             if 'llm' in responses:
                 st.session_state['generated'].append(responses['llm'])
@@ -132,14 +129,12 @@ class ChatView(View):
         
         with self.llm_message.container():
             if st.session_state['generated_stream']:
-                print("LLM Stream: ",st.session_state['generated_stream'])
                 st.write_stream(st.session_state['generated_stream'])
             elif st.session_state['generated']:
                 self.llm_message.markdown(st.session_state['generated'][-1])
             
         with self.rag_message.container():
             if st.session_state['rag_stream']:
-                print("RAG Stream: ",st.session_state['rag_stream'])
                 st.write_stream(st.session_state['rag_stream'])
                 # for chunk in st.session_state['rag_stream']:
                 #     if "answer" in chunk:

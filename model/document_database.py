@@ -138,13 +138,11 @@ class DocumentDatabase(Database):
             return responses
         if output_format == "stream":
             # Get sources
-            # print(rag_chain.invoke(query))
-            # sources = rag_chain.invoke(query).metadata["source"]
             sources = []
             context = rag_chain.invoke(query)["context"]
             answer_chain = rag_chain.pick("answer")
             for i in range(len(context)):
-                print("Context: ",context[i].metadata)
+                print("Context: ",context[i].metadata["source"])
                 sources.append(context[i].metadata["source"])
                 if "page" in context[i].metadata:
                     sources[i] += "\n\n Pagina " + str(context[i].metadata["page"])
