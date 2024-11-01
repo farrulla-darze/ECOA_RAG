@@ -20,7 +20,7 @@ openai_key = os.getenv("OPENAI_API_KEY")
 class DocumentDatabase(Database):
 
     paths = []
-    base_path = "data/SRIJ Regulação e Normas/"
+    base_path = "data/SRIJ Regulação e Normas\\"
 
     def format_docs(self, docs: List[Document]):
         return "\n\n".join(doc.page_content for doc in docs)
@@ -96,7 +96,6 @@ class DocumentDatabase(Database):
             You are a compliance expert in the sports betting bussiness giving legal advice to a client.
             The client asks you the following question: "{question}"
             You have to provide an answer based on the following documents:{context}
-            Be concise and clear in your answer.
         ''')
         # prompt = hub.pull("rlm/rag-prompt")
         
@@ -140,6 +139,8 @@ class DocumentDatabase(Database):
             # Get sources
             sources = []
             context = rag_chain.invoke(query)["context"]
+            if len(context) == 0:
+                print("No context found!!!!!!")
             answer_chain = rag_chain.pick("answer")
             for i in range(len(context)):
                 print("Context: ",context[i].metadata["source"])

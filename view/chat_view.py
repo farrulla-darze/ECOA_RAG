@@ -41,7 +41,7 @@ def format_function(text):
 class ChatView(View):
 
     def __init__(self):
-        st.title("Compliance Assistant")
+        st.title("Compliance AI")
         
         search_params = st.expander("Search Parameters", expanded=False)
 
@@ -66,8 +66,8 @@ class ChatView(View):
             self.third_placeholder = st.empty()
         with col1:
             self.human_message = st.chat_message("user")
-            self.llm_message = st.chat_message("gpt")
             self.rag_message = st.chat_message("rag")
+            self.llm_message = st.chat_message("gpt")
 
         
         self.user_input = st.text_input("Type your message here:", "")
