@@ -12,6 +12,8 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 import os
 from model.database import Database
+# from database import Database
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -20,7 +22,7 @@ openai_key = os.getenv("OPENAI_API_KEY")
 class DocumentDatabase(Database):
 
     paths = []
-    base_path = "data/SRIJ Regulação e Normas\\"
+    base_path = "data/SRIJ Regulação e Normas"
 
     def format_docs(self, docs: List[Document]):
         return "\n\n".join(doc.page_content for doc in docs)
@@ -28,12 +30,12 @@ class DocumentDatabase(Database):
 
     def _initialize(self, load=True, file_path="data/", text_splitter=None, loader=None):
         if os.path.exists("./chroma_db") and load:
-        
+            print("Loading")
             self.vectorstore = Chroma(
                 persist_directory="./chroma_db",
                 embedding_function=OpenAIEmbeddings()
             )
-
+            print(len(self.vectorstore.get()))
         else:
 
             print("Loading documents from PDFs")
@@ -78,11 +80,14 @@ class DocumentDatabase(Database):
         if len(args) > 0:
             chain_params = args[0]
         if "filter_dict" in kwargs.keys():
+            print("Filter dict in setup: ", kwargs["filter_dict"])
             filter_dict = kwargs["filter_dict"]
             for i in range(len(filter_dict["filters"])):
-                full_filter = self.base_path + filter_dict["filters"][i]
+                full_filter = self.base_path + "/" + filter_dict["filters"][i]
                 filter_dict["filters"][i] = full_filter
+            print("Full Filter dict in setup: ", filter_dict)
             retriever = self.vectorstore.as_retriever(
+                
                 search_kwargs={
                     "k": chain_params["retriever_k"],
                     "filter": {"subject": {"$in":filter_dict["filters"]}},

@@ -1,5 +1,5 @@
 # from model import Database
-from model import WebDatabase, DocumentDatabase
+from model import DocumentDatabase
 from view import *
 from controller import ChatController
 
