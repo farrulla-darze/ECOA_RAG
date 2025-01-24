@@ -2,6 +2,7 @@ import os
 import streamlit as st
 from view.view import View
 from streamlit_chat import message
+from streamlit_float import float_init
 # from model.database import ask_rag
 
 def _generate_context(prompt, context_data='generated'):
@@ -47,7 +48,7 @@ class ChatView(View):
         with logo:
             st.image("view/images/verid_logo.png", width=100)
         
-        search_params = st.expander("Search Parameters", expanded=False)
+        search_params = st.expander("Parametros de busca", expanded=False)
 
         with search_params:
             k_filter, docs_filters = st.columns([1, 1])
@@ -73,8 +74,13 @@ class ChatView(View):
             self.rag_message = st.chat_message("rag")
             self.llm_message = st.chat_message("gpt")
 
+        text_container = st.container()
+        with text_container:
+            self.user_input = st.text_input("", "Digite sua mensagem aqui", key="input")
         
-        self.user_input = st.text_input("Type your message here:", "")
+        text_container.float(
+            "display:flex; align-items:center;justify-content:center; overflow:hidden visible;flex-direction:column; position:fixed;bottom:15px;"
+        )
 
         st.session_state['user_input'] = []
         st.session_state['generated_stream'] = None
@@ -109,6 +115,7 @@ class ChatView(View):
         return self.search_filter
 
     def display(self, responses:dict=None):
+        float_init()
         if self.user_input:
             st.session_state['user_input'].append(self.user_input)
             if 'llm' in responses:

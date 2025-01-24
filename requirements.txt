@@ -11,4 +11,5 @@ ragas
 termcolor
 pydantic
 streamlit
+streamlit-float
 langchain-chroma
