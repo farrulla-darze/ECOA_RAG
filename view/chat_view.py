@@ -24,14 +24,14 @@ def _get_text():
     input_text = st.text_input("Ask away", "", key="input")
     return input_text
 
-def format_function(text):
+def format_function(text, wrap_limit=10):
     "Wrap text in newline if it's to big"
     new_text = ""
     line = ""
     for word in text.split():
         line += word + " "
         new_text += word + " "
-        if len(line) > 10:
+        if len(line) > wrap_limit:
             new_text += "\n"
             line = ""
     return new_text
@@ -41,7 +41,11 @@ def format_function(text):
 class ChatView(View):
 
     def __init__(self):
-        st.title("Compliance AI")
+        name,logo = st.columns([1,1])
+        with name:
+            st.title("Verid")
+        with logo:
+            st.image("view/images/verid_logo.png", width=100)
         
         search_params = st.expander("Search Parameters", expanded=False)
 
@@ -152,9 +156,9 @@ class ChatView(View):
                 #             st.session_state['source'],key=self.key, height=240)
         
         self.key += 1
-                
 
-# if __name__ == "__main__":
-#     view = ChatView()
-#     view.display()
-#     # setup_view()
+
+# # if __name__ == "__main__":
+# view = ChatView()
+# view.display()
+# #     # setup_view()

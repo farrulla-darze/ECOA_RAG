@@ -1,5 +1,4 @@
 from typing import List
-from langchain import hub
 # import promptTemplate
 from langchain_core.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -15,7 +14,7 @@ from model.database import Database
 # from database import Database
 
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(override=True)
 
 openai_key = os.getenv("OPENAI_API_KEY")
 
@@ -157,3 +156,4 @@ class DocumentDatabase(Database):
             responses = {"query": query, "llm": llm.invoke(query).content, "rag": rag_chain.invoke(query)}
         return responses
 
+print("Document Database Loaded")
