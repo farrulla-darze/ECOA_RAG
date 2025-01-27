@@ -2,6 +2,7 @@ import os
 import streamlit as st
 from view.view import View
 from streamlit_chat import message
+from streamlit_float import float_init
 # from model.database import ask_rag
 
 def _generate_context(prompt, context_data='generated'):
@@ -24,14 +25,40 @@ def _get_text():
     input_text = st.text_input("Ask away", "", key="input")
     return input_text
 
+def format_function(text, wrap_limit=10):
+    "Wrap text in newline if it's to big"
+    new_text = ""
+    line = ""
+    for word in text.split():
+        line += word + " "
+        new_text += word + " "
+        if len(line) > wrap_limit:
+            new_text += "\n"
+            line = ""
+    return new_text
 # if 'user_input' not in st.session_state:
 
 
 class ChatView(View):
 
     def __init__(self):
-        st.title("Compliance Assistant")
-        self.values = st.slider("Buscar em quantos documentos", 1, 10)
+        name,logo = st.columns([1,1])
+        with name:
+            st.title("Verid")
+        with logo:
+            st.image("view/images/verid_logo.png", width=100)
+        
+        search_params = st.expander("Parametros de busca", expanded=False)
+
+        with search_params:
+            k_filter, docs_filters = st.columns([1, 1])
+            with k_filter:
+                self.values = st.slider("Buscar em quantos documentos", 1, 10)
+            with docs_filters:
+                # TODO: Change hardcode strings to dynamic values
+                topics = ["AML FT", "Lei de Defesa do Consumidor", "Procedimento Adminsitrativo e Contraordenações", "Regulação de Jogos","Regulação de Pagamentos"]
+                self.search_filter = st.multiselect("Filtrar por", topics, default=topics, format_func=format_function)
+                # self
         self.retriever_k = 1
 
 
@@ -40,15 +67,20 @@ class ChatView(View):
         self.key:int=0
 
         with col2:
-            self.another_placeholder = st.empty()
+            self.sources_tab = st.empty()
             self.third_placeholder = st.empty()
         with col1:
             self.human_message = st.chat_message("user")
-            self.llm_message = st.chat_message("gpt" )
-            self.rag_message = st.chat_message("rag" )
+            self.rag_message = st.chat_message("rag")
+            self.llm_message = st.chat_message("gpt")
 
+        text_container = st.container()
+        with text_container:
+            self.user_input = st.text_input("", "Digite sua mensagem aqui", key="input")
         
-        self.user_input = st.text_input("Type your message here:", "")
+        text_container.float(
+            "display:flex; align-items:center;justify-content:center; overflow:hidden visible;flex-direction:column; position:fixed;bottom:15px;"
+        )
 
         st.session_state['user_input'] = []
         st.session_state['generated_stream'] = None
@@ -78,10 +110,13 @@ class ChatView(View):
     def get_text(self):
         self.retriever_k = self.values
         return self.user_input
+    
+    def get_search_filters(self):
+        return self.search_filter
 
     def display(self, responses:dict=None):
+        float_init()
         if self.user_input:
-            print(responses.get)        
             st.session_state['user_input'].append(self.user_input)
             if 'llm' in responses:
                 st.session_state['generated'].append(responses['llm'])
@@ -105,14 +140,12 @@ class ChatView(View):
         
         with self.llm_message.container():
             if st.session_state['generated_stream']:
-                print("LLM Stream: ",st.session_state['generated_stream'])
                 st.write_stream(st.session_state['generated_stream'])
             elif st.session_state['generated']:
                 self.llm_message.markdown(st.session_state['generated'][-1])
             
         with self.rag_message.container():
             if st.session_state['rag_stream']:
-                print("RAG Stream: ",st.session_state['rag_stream'])
                 st.write_stream(st.session_state['rag_stream'])
                 # for chunk in st.session_state['rag_stream']:
                 #     if "answer" in chunk:
@@ -121,7 +154,7 @@ class ChatView(View):
                 self.rag_message.markdown(st.session_state['rag_generated'][-1])
 
         # Generated Cypher statements
-        with self.another_placeholder.container():
+        with self.sources_tab.container():
             if st.session_state['sources']:
                 for i in range(len(st.session_state['sources'])):
                     st.write(st.session_state['sources'][i])
@@ -130,9 +163,9 @@ class ChatView(View):
                 #             st.session_state['source'],key=self.key, height=240)
         
         self.key += 1
-                
 
-# if __name__ == "__main__":
-#     view = ChatView()
-#     view.display()
-#     # setup_view()
+
+# # if __name__ == "__main__":
+# view = ChatView()
+# view.display()
+# #     # setup_view()

@@ -9,4 +9,7 @@ selenium
 unstructured
 ragas
 termcolor
-langchain-pinecone
+pydantic
+streamlit
+streamlit-float
+langchain-chroma

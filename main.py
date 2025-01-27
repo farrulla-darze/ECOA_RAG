@@ -1,12 +1,12 @@
 # from model import Database
-from model import WebDatabase, DocumentDatabase
+from model import DocumentDatabase
 from view import *
 from controller import ChatController
 
 
 if __name__ == "__main__":
     # Initialize MVC components
-    model = DocumentDatabase()
+    model = DocumentDatabase(file_path="data/SRIJ Regulação e Normas")
     view = ChatView()
     controller = ChatController(model, view)
 

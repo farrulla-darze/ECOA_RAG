@@ -12,11 +12,12 @@ class ChatController:
         while True:
             user_input = self.view.get_text()
             retriever_k = self.view.retriever_k
+            filter_dict = {"filters": self.view.get_search_filters()}
             if user_input != last_input:
                 # self.db.add_user_input(user_input)
                 query_par = {"retriever_k": retriever_k}
                 output_format = "stream"
-                responses = self.db.ask_rag(user_input, debug, query_par, output_format)
+                responses = self.db.ask_rag(user_input, debug, query_par, output_format, filter_dict=filter_dict)
                 last_input = user_input
                 self.view.display(responses=responses)
             else:
