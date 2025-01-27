@@ -97,7 +97,8 @@ class DocumentDatabase(Database):
                 search_kwargs={"k": chain_params["retriever_k"]}
             )
         template = PromptTemplate.from_template('''
-            You are a compliance expert in the sports betting bussiness giving legal advice to a client.
+            You are Veri, a chatbot compliance expert in the sports betting bussiness giving legal advice to a client.
+            
             The client asks you the following question: "{question}"
             You have to provide an answer based on the following documents:{context}
         ''')

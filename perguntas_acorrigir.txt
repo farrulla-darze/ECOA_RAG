@@ -1,0 +1,14 @@
+O que o operador de jogo online portugues deve fazer com contas fechadas que tenham ainda saldo remanescente? 
+
+Resposta:
+Context: data/SRIJ Regulação e Normas/Regulação de Jogos/Regulação sobre sistema técnico de jogo GERAL/Orientaçao_n_1_2019_SRIJ_JO_ADC_Correçao_de_apostas_indevidamente_resolvidas.pdf
+Context:  data/SRIJ Regulação e Normas/Regulação de Jogos/Regulação sobre sistema técnico de jogo GERAL/Orientações de reporte dos estados do registo e conta do jogador - Excel....pdf
+Context:  data/SRIJ Regulação e Normas/Regulação de Jogos/Regulação sobre sistema técnico de jogo GERAL/Regulamento Requisitos Sistema Tecnico de Jogo ONLINE.pdf
+Context:  data/SRIJ Regulação e Normas/Regulação de Jogos/Orientações sobre Levantamento de Saldo/Orientaçao_n_4_2018_SRIJ_JO_Levantamento_saldo_conta_jogador.pdf
+Context:  data/SRIJ Regulação e Normas/Regulação de Jogos/Regulação sobre sistema técnico de jogo GERAL/Orientaçao_n_1_2019_SRIJ_JO_ADC_Correçao_de_apostas_indevidamente_resolvidas.pdf
+
+Gabarito:
+data/pdfs/SRIJ Regulação e Normas/___DL n.º 66_2015, de 29 de Abril.pdf
+data/pdfs/SRIJ Regulação e Normas/Regulamento 836_2015 - Regras e procedimentos REGISTO E CONTA de Jogador.pdf
+data/SRIJ Regulação e Normas/Regulação de Jogos/Regulação sobre sistema técnico de jogo GERAL/Regulamento Requisitos Sistema Tecnico de Jogo ONLINE.pdf
+
