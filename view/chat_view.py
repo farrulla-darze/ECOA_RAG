@@ -73,7 +73,7 @@ class ChatView(View):
         with col1:
             self.human_message = st.chat_message("user")
             self.rag_message = st.chat_message("rag", avatar=logo_img)
-            self.llm_message = st.chat_message("🤖🤖")
+            self.llm_message = st.chat_message("🤖")
 
         text_container = st.container()
         with text_container:

@@ -98,10 +98,10 @@ class DocumentDatabase(Database):
             )
         template = PromptTemplate.from_template('''
             You are Veri, a chatbot compliance expert in the sports betting bussiness giving legal advice to a client.
-            
+            All answers must be related to the domain of online gambling.
             The client asks you the following question: "{question}"
             You have to provide an answer based on the following documents:{context}
-            Be concise and clear in your answer.
+            Provide all legals and technical information available to answer the question in details.
         ''')
         # prompt = hub.pull("rlm/rag-prompt")
         
