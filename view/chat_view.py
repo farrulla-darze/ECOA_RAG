@@ -3,6 +3,8 @@ import streamlit as st
 from view.view import View
 from streamlit_chat import message
 from streamlit_float import float_init
+from PIL import Image
+
 # from model.database import ask_rag
 
 def _generate_context(prompt, context_data='generated'):
@@ -42,11 +44,9 @@ def format_function(text, wrap_limit=10):
 class ChatView(View):
 
     def __init__(self):
-        name,logo = st.columns([1,1])
-        with name:
-            st.title("Verid")
+        logo = st.columns(1)[0]
         with logo:
-            st.image("view/images/verid_logo.png", width=100)
+            st.image("view/images/verid_logo.png", width=300)
         
         search_params = st.expander("Parametros de busca", expanded=False)
 
@@ -65,18 +65,19 @@ class ChatView(View):
         col1, col2 = st.columns([4, 1])
 
         self.key:int=0
+        logo_img = Image.open("view/images/verid_check.png")
 
         with col2:
             self.sources_tab = st.empty()
             self.third_placeholder = st.empty()
         with col1:
             self.human_message = st.chat_message("user")
-            self.rag_message = st.chat_message("rag")
-            self.llm_message = st.chat_message("gpt")
+            self.rag_message = st.chat_message("rag", avatar=logo_img)
+            self.llm_message = st.chat_message("🤖🤖")
 
         text_container = st.container()
         with text_container:
-            self.user_input = st.text_input("", "Digite sua mensagem aqui", key="input")
+            self.user_input = st.text_input("", "", key="input")
         
         text_container.float(
             "display:flex; align-items:center;justify-content:center; overflow:hidden visible;flex-direction:column; position:fixed;bottom:15px;"

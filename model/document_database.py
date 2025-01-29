@@ -84,7 +84,7 @@ class DocumentDatabase(Database):
             for i in range(len(filter_dict["filters"])):
                 full_filter = self.base_path + "/" + filter_dict["filters"][i]
                 filter_dict["filters"][i] = full_filter
-            print("Full Filter dict in setup: ", filter_dict)
+            # print("Full Filter dict in setup: ", filter_dict)
             retriever = self.vectorstore.as_retriever(
                 
                 search_kwargs={
@@ -101,6 +101,7 @@ class DocumentDatabase(Database):
             
             The client asks you the following question: "{question}"
             You have to provide an answer based on the following documents:{context}
+            Be concise and clear in your answer.
         ''')
         # prompt = hub.pull("rlm/rag-prompt")
         
@@ -131,7 +132,7 @@ class DocumentDatabase(Database):
         filter_dict = {}
         if "filter_dict" in kwargs:
             filter_dict = kwargs["filter_dict"]
-            print("Filter dict: ", filter_dict)
+            # print("Filter dict: ", filter_dict)
             rag_chain = self._setup_rag(chain_params, filter_dict=filter_dict)
         else:
             rag_chain = self._setup_rag(chain_params)
